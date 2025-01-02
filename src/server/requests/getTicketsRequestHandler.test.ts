@@ -1,18 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { LinearClient, User } from "@linear/sdk";
-import type { IssueConnection } from "@linear/sdk";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import {
+  LinearClient,
+  User,
+  IssueConnection,
+  Organization,
+  Team,
+} from "@linear/sdk";
+import type { LinearFetch } from "@linear/sdk";
 import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
-import { handleRequest } from "./getTicketsRequestHandler.js";
+import { handleRequest } from "./getTicketsRequestHandler";
 
 // Mock Linear SDK
 vi.mock("@linear/sdk", () => ({
-  LinearClient: vi.fn(() => ({
+  LinearClient: vi.fn().mockImplementation(() => ({
     viewer: vi.fn(),
   })),
 }));
 
-// Create type-safe mock
-const MockLinearClient = vi.mocked(LinearClient);
+// Get the mock constructor
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const MockLinearClient = LinearClient as unknown as Mock<typeof LinearClient>;
 
 describe("getTicketsRequestHandler", () => {
   beforeEach(() => {
@@ -21,6 +28,7 @@ describe("getTicketsRequestHandler", () => {
 
   it("should throw an error if no API key is provided", async () => {
     // @ts-expect-error - Testing invalid input
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await expect(handleRequest({})).rejects.toThrow(
       new McpError(ErrorCode.InvalidParams, "API key is required"),
     );
@@ -32,17 +40,49 @@ describe("getTicketsRequestHandler", () => {
       nodes: [],
     };
 
+    const mockAssignedIssues = vi.fn().mockResolvedValue(mockIssueConnection);
+    const now = new Date();
+
+    // Create a mock User with required properties
     const mockUser = {
-      assignedIssues: vi.fn().mockResolvedValue(mockIssueConnection),
-    } as unknown as User;
+      id: "test-user",
+      name: "Test User",
+      email: "test@example.com",
+      active: true,
+      admin: false,
+      assignedIssues: mockAssignedIssues,
+      createdAt: now,
+      updatedAt: now,
+      displayName: "Test User",
+      avatarUrl: "test-url",
+      avatarBackgroundColor: "#000000",
+      createdIssueCount: 0,
+      disableReason: undefined,
+      guest: false,
+      isMe: true,
+      lastSeen: now,
+      organization: Promise.resolve({
+        id: "test-org",
+        name: "Test Org",
+      }) as LinearFetch<Organization>,
+      statusEmoji: undefined,
+      statusLabel: undefined,
+      statusUntilAt: undefined,
+      teamIds: ["test-team"],
+      teams: (() => Promise.resolve({ nodes: [] as Team[] })) as User["teams"],
+      timezone: "UTC",
+      url: "test-url",
+    } as Partial<User>;
 
-    MockLinearClient.mockImplementation(
-      () =>
-        ({
-          viewer: Promise.resolve(mockUser),
-        }) as unknown as LinearClient,
-    );
+    const mockViewer = Promise.resolve(mockUser) as LinearFetch<User>;
+    const mockClient = {
+      viewer: mockViewer,
+      options: {},
+    } as LinearClient;
 
+    MockLinearClient.mockImplementation(() => mockClient);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const result = await handleRequest({ apiKey: "test-key" });
 
     expect(result).toEqual({
@@ -58,13 +98,15 @@ describe("getTicketsRequestHandler", () => {
   it("should handle unexpected errors properly", async () => {
     // Mock Linear client to throw an error
     const mockError = new Error("Unexpected API error");
-    MockLinearClient.mockImplementation(
-      () =>
-        ({
-          viewer: Promise.reject(mockError),
-        }) as unknown as LinearClient,
-    );
+    const mockViewer = Promise.reject(mockError) as LinearFetch<User>;
+    const mockClient = {
+      viewer: mockViewer,
+      options: {},
+    } as LinearClient;
 
+    MockLinearClient.mockImplementation(() => mockClient);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await expect(handleRequest({ apiKey: "test-key" })).rejects.toThrow(
       new McpError(
         ErrorCode.InternalError,

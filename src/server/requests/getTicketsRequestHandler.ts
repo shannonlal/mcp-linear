@@ -1,7 +1,7 @@
 import { LinearClient } from "@linear/sdk";
 import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
 
-interface GetTicketsArgs {
+export interface GetTicketsArgs {
   apiKey: string;
   status?: "active" | "completed" | "canceled";
   limit?: number;
