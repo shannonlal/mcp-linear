@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "outDir": "./build",
-    "rootDir": "./src",
+    "rootDir": "./src/server",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,6 +12,6 @@
     "declaration": true,
     "sourceMap": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/server/**/*.ts"],
   "exclude": ["node_modules", "build", "test", "**/*.test.ts"]
 }
