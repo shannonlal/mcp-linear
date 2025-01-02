@@ -71,10 +71,15 @@ class LinearMcpServer {
         );
       }
 
-      // TODO: Implement actual Linear API integration
-      throw new McpError(
-        ErrorCode.InternalError,
-        "Linear API integration not yet implemented",
+      const { handleRequest } = await import(
+        "./requests/getTicketsRequestHandler.js"
+      );
+      return handleRequest(
+        request.params.arguments as {
+          apiKey: string;
+          status?: "active" | "completed" | "canceled";
+          limit?: number;
+        },
       );
     });
   }
