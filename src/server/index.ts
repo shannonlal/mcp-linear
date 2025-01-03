@@ -7,6 +7,7 @@ import {
   McpError,
   ErrorCode,
 } from "@modelcontextprotocol/sdk/types.js";
+
 declare const process: NodeJS.Process;
 
 class LinearMcpServer {
@@ -30,7 +31,7 @@ class LinearMcpServer {
 
   private setupTools(): void {
     // Define available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    this.server.setRequestHandler(ListToolsRequestSchema, () => ({
       tools: [
         {
           name: "get-linear-tickets",
@@ -38,10 +39,6 @@ class LinearMcpServer {
           inputSchema: {
             type: "object",
             properties: {
-              apiKey: {
-                type: "string",
-                description: "Linear API key for authentication",
-              },
               status: {
                 type: "string",
                 description:
@@ -56,7 +53,6 @@ class LinearMcpServer {
                 maximum: 50,
               },
             },
-            required: ["apiKey"],
           },
         },
       ],
@@ -85,6 +81,12 @@ class LinearMcpServer {
   }
 
   async run(): Promise<void> {
+    //dotenv.config();
+    const apiKey = process.env.LINEAR_API_KEY;
+    if (!apiKey) {
+      console.error("LINEAR_API_KEY environment variable is required");
+      process.exit(1);
+    }
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
     console.error("Linear MCP Server running on stdio");

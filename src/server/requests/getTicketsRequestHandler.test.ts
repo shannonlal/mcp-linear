@@ -19,7 +19,7 @@ vi.mock("@linear/sdk", () => ({
 
 // Get the mock constructor
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const MockLinearClient = LinearClient as unknown as Mock<typeof LinearClient>;
+const MockLinearClient = LinearClient as unknown as Mock;
 
 describe("getTicketsRequestHandler", () => {
   beforeEach(() => {

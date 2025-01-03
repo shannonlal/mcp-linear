@@ -8,16 +8,23 @@
     "mcp-postman": "./build/index.js"
   },
   "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
-    "test": "vitest",
-    "prepare": "husky"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepare": "husky",
+    "test": "vitest"
   },
-  "keywords": [],
+  "keywords": [
+    "mcp",
+    "linear"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@linear/sdk": "^37.0.0",
-    "@modelcontextprotocol/sdk": "^1.0.4"
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "dotenv": "^10.0.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
