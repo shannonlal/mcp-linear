@@ -2,13 +2,14 @@
   "name": "mcp-linear",
   "version": "0.0.1",
   "description": "",
-  "main": "build/index.js",
+  "main": "build/server/index.js",
   "type": "module",
   "bin": {
-    "mcp-postman": "./build/index.js"
+    "mcp-postman": "./build/server/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod +x build/index.js",
+    "build": "tsc && chmod +x build/server/index.js",
+    "start": "node build/server/index.js",
     "clean": "rm -rf build",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",

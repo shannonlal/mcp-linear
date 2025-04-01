@@ -4,14 +4,15 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "outDir": "./build",
-    "rootDir": "./src/server",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/server/**/*.ts"],
-  "exclude": ["node_modules", "build", "test", "**/*.test.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "build", "**/*.test.ts"]
 }
